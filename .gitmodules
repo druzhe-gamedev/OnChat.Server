@@ -1,0 +1,3 @@
+[submodule "OnChat.Shared"]
+	path = OnChat.Shared
+	url = git@github.com:druzhe-gamedev/OnChat.Shared.git
