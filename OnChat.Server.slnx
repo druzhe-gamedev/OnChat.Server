@@ -1,4 +1,5 @@
 <Solution>
+  <Project Path="OnChat.Protocol/OnChat.Protocol.csproj" />
   <Project Path="OnChat.Server/OnChat.Server.csproj" />
   <Project Path="OnChat.Shared/OnChat.Shared.csproj" />
 </Solution>

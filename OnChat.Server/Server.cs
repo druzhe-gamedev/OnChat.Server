@@ -1,8 +1,8 @@
 ﻿using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
+using OnChat.Connection;
 using OnChat.Protocol;
-using OnChat.Protocol.Connection;
 using Serilog;
 
 namespace OnChat;
@@ -13,7 +13,7 @@ public class Server : IDisposable
     private readonly CancellationTokenSource _cts = new();
     private readonly ConcurrentDictionary<long, ChatConnection> _clients = new ();
     private readonly ILogger _logger = Log.Logger.ForContext<Server>();
-    public readonly ChatProtocol Protocol = new();
+    public readonly BinaryProtocol Protocol = new();
     
     private bool _disposed;
 
@@ -55,7 +55,7 @@ public class Server : IDisposable
     {
         try
         {
-            ChatConnection connection = new(client, this);
+             ChatConnection connection = new(client, this);
 
             if (!_clients.TryAdd(_clients.Count + 1, connection))
             {

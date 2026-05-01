@@ -1,8 +1,8 @@
 ﻿using System.Net.Sockets;
-using OnChat.Shared;
+using OnChat.Protocol;
 using Serilog;
 
-namespace OnChat.Protocol.Connection;
+namespace OnChat.Connection;
 
 public class ChatConnection(TcpClient client, Server server) : IAsyncDisposable
 {
@@ -17,16 +17,9 @@ public class ChatConnection(TcpClient client, Server server) : IAsyncDisposable
                 continue;
 
             using ProtocolBuffer buffer = await ProtocolBuffer.CreateFromReader(new BinaryReader(_stream));
-            PacketType packetType = (PacketType)buffer.Reader.ReadByte();
-            _logger.Information($"packetType: {packetType}");
-            /*long bytesAvailable = buffer.Stream.Length - buffer.Stream.Position;
-            _logger.Information($"bytes: {bytesAvailable}");*/
+            PacketId packetType = (PacketId)buffer.Reader.ReadByte();
             
-            /*while (bytesAvailable > 0)
-            {*/
-                server.Protocol.Handlers[packetType].Handle(buffer);
-            /*    bytesAvailable = buffer.Stream.Length - buffer.Stream.Position;
-            }*/
+            server.Protocol.Handlers[packetType].Handle(buffer);
         }
     }
 
