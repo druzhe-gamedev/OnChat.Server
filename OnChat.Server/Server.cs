@@ -1,19 +1,18 @@
-﻿using System.Collections.Concurrent;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
 using OnChat.Connection;
 using OnChat.Protocol;
 using Serilog;
 
 namespace OnChat;
 
-public class Server : IDisposable
+public class Server(ConnectionsList connectionsList, IServiceProvider serviceProvider, params Assembly[] packetAssemblies) : IDisposable
 {
     private TcpListener _listener;
     private readonly CancellationTokenSource _cts = new();
-    private readonly ConcurrentDictionary<long, ChatConnection> _clients = new ();
     private readonly ILogger _logger = Log.Logger.ForContext<Server>();
-    public readonly BinaryProtocol Protocol = new();
+    public readonly BinaryProtocol Protocol = new(serviceProvider, packetAssemblies);
     
     private bool _disposed;
 
@@ -55,9 +54,11 @@ public class Server : IDisposable
     {
         try
         {
-             ChatConnection connection = new(client, this);
+            ChatConnection connection = new(client, this);
 
-            if (!_clients.TryAdd(_clients.Count + 1, connection))
+            var clients = connectionsList.Clients;
+            
+            if (!clients.TryAdd(clients.Count, connection))
             {
                 _logger.Error("Couldn't add client");
                 return;
@@ -65,7 +66,7 @@ public class Server : IDisposable
             
             _logger.Information($"Connect client {client.Client.RemoteEndPoint}");
 
-            Task readTask = connection.ReadLoop();
+            Task readTask = connection.Read();
             
             await Task.WhenAll(readTask);
         }
