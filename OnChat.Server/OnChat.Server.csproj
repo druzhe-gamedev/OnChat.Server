@@ -9,13 +9,31 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Serilog" Version="4.3.2-dev-02419" />
-      <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
+        <PackageReference Include="JWT" Version="11.0.0" />
+        <PackageReference Include="linq2db" Version="6.2.1" />
+        <PackageReference Include="linq2db.PostgreSQL" Version="6.2.1" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="11.0.0-preview.3.26207.106" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="11.0.0-preview.3.26207.106" />
+        <PackageReference Include="Npgsql" Version="10.0.2" />
+        <PackageReference Include="Serilog" Version="4.3.2-dev-02419" />
+        <PackageReference Include="Serilog.Exceptions" Version="8.4.0" />
+        <PackageReference Include="Serilog.Extensions.Hosting" Version="10.0.0" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\OnChat.Protocol\OnChat.Protocol.csproj" />
-      <ProjectReference Include="..\OnChat.Shared\OnChat.Shared.csproj" />
+        <ProjectReference Include="..\OnChat.Protocol\OnChat.Protocol.csproj" />
+        <ProjectReference Include="..\OnChat.Shared\OnChat.Shared.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="Db\Models\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="appsettings.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
     </ItemGroup>
 
 </Project>
