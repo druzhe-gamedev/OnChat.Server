@@ -7,9 +7,9 @@ using Serilog;
 
 namespace OnChat;
 
-public class Server(ConnectionsList connectionsList, IServiceProvider serviceProvider, params Assembly[] packetAssemblies) : IDisposable
+public class Server(ConnectionsProvider connectionsProvider, IServiceProvider serviceProvider, params Assembly[] packetAssemblies) : IDisposable
 {
-    private TcpListener _listener;
+    private TcpListener _listener = null!;
     private readonly CancellationTokenSource _cts = new();
     private readonly ILogger _logger = Log.Logger.ForContext<Server>();
     public readonly BinaryProtocol Protocol = new(serviceProvider, packetAssemblies);
@@ -20,6 +20,7 @@ public class Server(ConnectionsList connectionsList, IServiceProvider servicePro
     {
         try
         {
+            Protocol.Setup();
             _listener = new(IPAddress.Parse("127.0.0.1"), 7596);
             _listener.Start();
         
@@ -54,9 +55,9 @@ public class Server(ConnectionsList connectionsList, IServiceProvider servicePro
     {
         try
         {
-            ChatConnection connection = new(client, this);
-
-            var clients = connectionsList.Clients;
+            var clients = connectionsProvider.Clients;
+            
+            ChatConnection connection = new(clients.Count, client, this, connectionsProvider);
             
             if (!clients.TryAdd(clients.Count, connection))
             {
