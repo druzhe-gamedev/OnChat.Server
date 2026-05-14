@@ -2,20 +2,23 @@
 using LinqToDB;
 using LinqToDB.Async;
 using Microsoft.Extensions.Configuration;
+using OnChat.Common.Packet;
 using OnChat.Configuration;
 using OnChat.Encryption;
 using OnChat.Protocol.PacketHandler;
 using OnChat.Shared.Auth;
+using OnChat.Shared.Auth.Validation;
 
 namespace OnChat.UsersManagement.Registration;
 
-public class RegistrationHandler(OnChatDb db, IConfiguration configuration/*, JwtTokensService tokensService*/) : PacketHandler<RegistrationPacket>
+public class RegistrationHandler(Server server, OnChatDb db, IConfiguration configuration)
+    : ValidationHandlerBase<RegistrationPacket>(server, new RegistrationValidator())
 {
-    protected override async Task Handle(RegistrationPacket packet, IConnection caller)
+    protected override async Task PacketHandle(RegistrationPacket packet, IConnection caller)
     {
         User? user =
             await db.Users.FirstOrDefaultAsync(user => user.Username == packet.Username || user.Mail == packet.Email);
-
+        
         if (user is null)
         {
             RegistrationSuccessfulResponse response = new(packet.CorrelationId, "Success");
