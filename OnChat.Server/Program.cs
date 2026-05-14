@@ -7,6 +7,7 @@ using OnChat;
 using OnChat.Connection;
 using OnChat.Encryption;
 using OnChat.Shared.Messages;
+using OnChat.UsersManagement.Authentication;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration().WriteTo.Console(
@@ -15,11 +16,13 @@ Log.Logger = new LoggerConfiguration().WriteTo.Console(
 
 HostApplicationBuilder builder = Host.CreateApplicationBuilder();
 builder.Configuration.AddJsonFile("appsettings.json");
-builder.Services.AddSingleton<ConnectionsList>();
+builder.Services.AddSingleton<ConnectionsProvider>();
+builder.Services.AddScoped<AuthValidationService>();
+builder.Services.AddMemoryCache();
 builder.Services.AddSerilog();
-builder.Services.AddSingleton<JwtTokensService>();
+builder.Services.AddSingleton<TokensService>();
 builder.Services.AddSingleton(sp => new Server(
-        sp.GetService<ConnectionsList>()!,
+        sp.GetService<ConnectionsProvider>()!,
         sp,
         typeof(SendMessagePacket).Assembly
     )

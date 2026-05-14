@@ -12,6 +12,7 @@
         <PackageReference Include="JWT" Version="11.0.0" />
         <PackageReference Include="linq2db" Version="6.2.1" />
         <PackageReference Include="linq2db.PostgreSQL" Version="6.2.1" />
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.7" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="11.0.0-preview.3.26207.106" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="11.0.0-preview.3.26207.106" />
         <PackageReference Include="Npgsql" Version="10.0.2" />
@@ -28,6 +29,7 @@
 
     <ItemGroup>
         <Folder Include="Db\Models\" />
+        <Folder Include="PacketHandlers\" />
     </ItemGroup>
 
     <ItemGroup>
