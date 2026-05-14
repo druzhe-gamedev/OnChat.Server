@@ -6,6 +6,7 @@ using OnChat.Common.Packet;
 using OnChat.Configuration;
 using OnChat.Encryption;
 using OnChat.Protocol.PacketHandler;
+using OnChat.Protocol.Packets;
 using OnChat.Shared.Auth;
 using OnChat.Shared.Auth.Validation;
 
@@ -14,7 +15,7 @@ namespace OnChat.UsersManagement.Registration;
 public class RegistrationHandler(Server server, OnChatDb db, IConfiguration configuration)
     : ValidationHandlerBase<RegistrationPacket>(server, new RegistrationValidator())
 {
-    protected override async Task PacketHandle(RegistrationPacket packet, IConnection caller)
+    protected override async Task<IResponse> PacketHandle(RegistrationPacket packet, IConnection caller)
     {
         User? user =
             await db.Users.FirstOrDefaultAsync(user => user.Username == packet.Username || user.Mail == packet.Email);
@@ -32,10 +33,9 @@ public class RegistrationHandler(Server server, OnChatDb db, IConfiguration conf
                                      PasswordHash = passwordHash
                                  });
             
-            await caller.Write(response);
-            return;
+            return response;
         }
 
-        await caller.Write(new RegistrationFailureResponse(packet.CorrelationId, "User already exists"));
+        return new RegistrationFailureResponse(packet.CorrelationId, "User already exists");
     }
 }

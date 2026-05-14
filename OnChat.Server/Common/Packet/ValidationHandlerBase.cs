@@ -7,30 +7,25 @@ namespace OnChat.Common.Packet;
 
 public abstract class ValidationHandlerBase<T>(Server server, IValidator<T> validator) : PacketHandler<T> where T : BasePacket
 {
-    protected override async Task Handle(T packet, IConnection caller)
+    protected override async Task<IResponse> Handle(T packet, IConnection caller)
     {
         if (validator.Validate(packet) is ValidationResultError<PacketId> error)
         {
             if (!server.Protocol.Packets.TryGetValue(error.ErrorCode, out Type? packetType) ||
                 packetType.BaseType != typeof(FailureResponse))
-                return;
+                return new ValidationFailurePacket(packet.CorrelationId, "Validation error");
 
             FailureResponse failureResponse = (FailureResponse)Activator.CreateInstance(
                 packetType,
                 packet.CorrelationId,
                 error.Description
             )!;
-
             
-            await caller.Write(failureResponse);
-            return;
+            return failureResponse;
         }
 
-        await PacketHandle(packet, caller);
+        return await PacketHandle(packet, caller);
     }
-    
-    protected virtual Task PacketHandle(T packet, IConnection caller)
-    {
-        return Task.CompletedTask;
-    }
+
+    protected abstract Task<IResponse> PacketHandle(T packet, IConnection caller);
 }

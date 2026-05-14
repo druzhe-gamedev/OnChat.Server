@@ -69,14 +69,20 @@ public class ChatConnection(long id, TcpClient client, Server server, Connection
 
                 if (!server.Protocol.Packets.TryGetValue(packetId, out Type? packetType))
                 {
-                    _logger.Error($"Packet id {packetId} is not registered");
+                    _logger.Error("Packet id {PacketId} is not registered", packetId);
                     return;
                 }
 
                 object packet = server.Protocol.GetCodec(packetType).Decode(buffer.Reader);
 
                 if (packet is IPacket sendable)
-                    await server.Protocol.Handlers[packet.GetType()].Handle(sendable, this);
+                {
+                    IPacketHandler handler = server.Protocol.Handlers[packet.GetType()];
+                    _logger.Information("Handling {PacketId} [{SendableCorrelationId}]", packetId, sendable.CorrelationId);
+                    IResponse response = await handler.Handle(sendable, this);
+                    _logger.Information("Response with {GetType} [{SendableCorrelationId}]", response.GetType(), sendable.CorrelationId);
+                    await Write(response);
+                }
                 else
                     _logger.Error("Packet is malformed");
             }

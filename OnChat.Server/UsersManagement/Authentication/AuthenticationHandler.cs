@@ -6,6 +6,7 @@ using OnChat.Configuration;
 using OnChat.Connection;
 using OnChat.Encryption;
 using OnChat.Protocol.PacketHandler;
+using OnChat.Protocol.Packets;
 using OnChat.Shared.Auth;
 
 namespace OnChat.UsersManagement.Authentication;
@@ -18,7 +19,7 @@ public class AuthenticationHandler(
     ILogger<AuthenticationHandler> logger
 ) : PacketHandler<AuthenticationPacket>
 {
-    protected override async Task Handle(AuthenticationPacket packet, IConnection caller)
+    protected override async Task<IResponse> Handle(AuthenticationPacket packet, IConnection caller)
     {
         logger.LogInformation("Logging in");
         
@@ -31,8 +32,7 @@ public class AuthenticationHandler(
                     configuration[ConfigurationConstants.HashSalt]!
                 ))
             {
-                await caller.Write(new WrongPasswordPacket(packet.CorrelationId, "Wrong password"));
-                return;
+                return new WrongPasswordPacket(packet.CorrelationId, "Wrong password");
             }
             
             TokenModel jwtToken = tokensService.CreateJwtToken(("id", user.Id), ("username", user.Username)!);
@@ -43,10 +43,9 @@ public class AuthenticationHandler(
             // todo check auth
             Authenticated? authenticated = caller.AuthenticationState as Authenticated;
             connectionsProvider.Users.TryAdd(authenticated!.UserId, authenticated);
-            await caller.Write(new TokensPacket(packet.CorrelationId, jwtToken, refreshToken));
-            return;
+            return new TokensPacket(packet.CorrelationId, jwtToken, refreshToken);
         }
         
-        await caller.Write(new WrongLoginPacket(packet.CorrelationId, "Wrong login"));
+        return new WrongLoginPacket(packet.CorrelationId, "Wrong login");
     }
 }
