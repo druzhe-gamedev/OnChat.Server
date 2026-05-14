@@ -39,12 +39,23 @@ namespace DataModel
 
 		partial void InitDataContext();
 
-		public ITable<User> Users => this.GetTable<User>();
+		public ITable<Message> Messages => this.GetTable<Message>();
+		public ITable<User>    Users    => this.GetTable<User>();
 	}
 
 	public static partial class ExtensionMethods
 	{
 		#region Table Extensions
+		public static Message? Find(this ITable<Message> table, Guid id)
+		{
+			return table.FirstOrDefault(e => e.Id == id);
+		}
+
+		public static Task<Message?> FindAsync(this ITable<Message> table, Guid id, CancellationToken cancellationToken = default)
+		{
+			return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+		}
+
 		public static User? Find(this ITable<User> table, Guid id)
 		{
 			return table.FirstOrDefault(e => e.Id == id);

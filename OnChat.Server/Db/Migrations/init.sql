@@ -1,12 +1,24 @@
 create table users
 (
     id       uuid
-        primary key unique default uuidv7(),
+        primary key unique not null default uuidv7(),
     mail     varchar(255)
-        unique,
-    username varchar(50) unique,
-    password_hash varchar(512),
-    age      smallint
+        unique not null,
+    username varchar(50) not null unique,
+    password_hash varchar(512) not null,
+    age      smallint not null,
+    public_key bytea null
+);
+
+create table messages(
+    id uuid primary key unique default uuidv7(),
+    ephemeral_public_key bytea not null,
+    nonce bytea not null,
+    ciphertext bytea not null,
+    tag bytea not null,
+    sender_id uuid not null references users(id),
+    receiver_id uuid not null references users(id),
+    timestamp timestamptz not null default now()
 );
 
 CREATE FUNCTION uuidv7(timestamptz DEFAULT clock_timestamp()) RETURNS uuid
