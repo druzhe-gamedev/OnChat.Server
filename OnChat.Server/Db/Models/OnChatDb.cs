@@ -39,8 +39,9 @@ namespace DataModel
 
 		partial void InitDataContext();
 
-		public ITable<Message> Messages => this.GetTable<Message>();
-		public ITable<User>    Users    => this.GetTable<User>();
+		public ITable<Message>        Messages         => this.GetTable<Message>();
+		public ITable<RecipientEntry> RecipientEntries => this.GetTable<RecipientEntry>();
+		public ITable<User>           Users            => this.GetTable<User>();
 	}
 
 	public static partial class ExtensionMethods
@@ -52,6 +53,16 @@ namespace DataModel
 		}
 
 		public static Task<Message?> FindAsync(this ITable<Message> table, Guid id, CancellationToken cancellationToken = default)
+		{
+			return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+		}
+
+		public static RecipientEntry? Find(this ITable<RecipientEntry> table, long id)
+		{
+			return table.FirstOrDefault(e => e.Id == id);
+		}
+
+		public static Task<RecipientEntry?> FindAsync(this ITable<RecipientEntry> table, long id, CancellationToken cancellationToken = default)
 		{
 			return table.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 		}
