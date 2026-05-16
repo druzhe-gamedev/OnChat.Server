@@ -17,25 +17,25 @@ namespace DataModel
 	[Table("users")]
 	public class User
 	{
-		[Column("id"           , SkipOnInsert = true, IsPrimaryKey = true)] public Guid    Id           { get; set; } // uuid
-		[Column("mail"                              )] public string? Mail         { get; set; } // character varying(255)
-		[Column("username"                          )] public string? Username     { get; set; } // character varying(50)
-		[Column("password_hash"                     )] public string? PasswordHash { get; set; } // character varying(512)
-		[Column("age"                               )] public short?  Age          { get; set; } // smallint
+		[Column("id"           , SkipOnInsert = true,  IsPrimaryKey = true)] public Guid    Id           { get; set; } // uuid
+		[Column("mail"                              )] public string Mail         { get; set; } = null!; // character varying(255)
+		[Column("username"                          )] public string Username     { get; set; } = null!; // character varying(50)
+		[Column("password_hash"                     )] public string PasswordHash { get; set; } = null!;// character varying(512)
+		[Column("age"                               )] public short  Age          { get; set; } // smallint
 		[Column("public_key"                        )] public byte[]? PublicKey    { get; set; } // bytea
 
 		#region Associations
 		/// <summary>
-		/// messages_receiver_id_fkey backreference
-		/// </summary>
-		[Association(ThisKey = nameof(Id), OtherKey = nameof(Message.ReceiverId))]
-		public IEnumerable<Message> Messages { get; set; } = null!;
-
-		/// <summary>
 		/// messages_sender_id_fkey backreference
 		/// </summary>
 		[Association(ThisKey = nameof(Id), OtherKey = nameof(Message.SenderId))]
-		public IEnumerable<Message> Messages1 { get; set; } = null!;
+		public IEnumerable<Message> Messages { get; set; } = null!;
+
+		/// <summary>
+		/// recipient_entries_recipient_id_fkey backreference
+		/// </summary>
+		[Association(ThisKey = nameof(Id), OtherKey = nameof(RecipientEntry.RecipientId))]
+		public IEnumerable<RecipientEntry> RecipientEntries { get; set; } = null!;
 		#endregion
 	}
 }

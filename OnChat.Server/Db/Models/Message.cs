@@ -7,6 +7,7 @@
 
 using LinqToDB.Mapping;
 using System;
+using System.Collections.Generic;
 
 #pragma warning disable 1573, 1591
 #nullable enable
@@ -22,21 +23,20 @@ namespace DataModel
 		[Column("ciphertext"          , CanBeNull    = false)] public byte[]         Ciphertext         { get; set; } = null!; // bytea
 		[Column("tag"                 , CanBeNull    = false)] public byte[]         Tag                { get; set; } = null!; // bytea
 		[Column("sender_id"                                 )] public Guid           SenderId           { get; set; } // uuid
-		[Column("receiver_id"                               )] public Guid           ReceiverId         { get; set; } // uuid
-		[Column("timestamp"           , SkipOnInsert  = true)] public DateTimeOffset Timestamp          { get; set; } // timestamp (6) with time zone
+		[Column("timestamp"           , SkipOnInsert = true )] public DateTimeOffset Timestamp          { get; set; } // timestamp (6) with time zone
 
 		#region Associations
-		/// <summary>
-		/// messages_receiver_id_fkey
-		/// </summary>
-		[Association(CanBeNull = false, ThisKey = nameof(ReceiverId), OtherKey = nameof(User.Id))]
-		public User Receiver { get; set; } = null!;
-
 		/// <summary>
 		/// messages_sender_id_fkey
 		/// </summary>
 		[Association(CanBeNull = false, ThisKey = nameof(SenderId), OtherKey = nameof(User.Id))]
 		public User Sender { get; set; } = null!;
+
+		/// <summary>
+		/// recipient_entries_message_id_fkey backreference
+		/// </summary>
+		[Association(ThisKey = nameof(Id), OtherKey = nameof(RecipientEntry.MessageId))]
+		public IEnumerable<RecipientEntry> RecipientEntries { get; set; } = null!;
 		#endregion
 	}
 }
