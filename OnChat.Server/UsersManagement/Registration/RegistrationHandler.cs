@@ -2,18 +2,18 @@
 using LinqToDB;
 using LinqToDB.Async;
 using Microsoft.Extensions.Configuration;
-using OnChat.Common.Packet;
+using OnChat.Common.Validation;
 using OnChat.Configuration;
 using OnChat.Encryption;
 using OnChat.Protocol.PacketHandler;
 using OnChat.Protocol.Packets;
 using OnChat.Shared.Auth;
-using OnChat.Shared.Auth.Validation;
+using OnChat.Shared.Validation;
 
 namespace OnChat.UsersManagement.Registration;
 
-public class RegistrationHandler(Server server, OnChatDb db, IConfiguration configuration)
-    : ValidationHandlerBase<RegistrationPacket>(server, new RegistrationValidator())
+public class RegistrationHandler(Server server, OnChatDb db, IConfiguration configuration, IValidator<RegistrationPacket> validator)
+    : ValidationHandlerBase<RegistrationPacket>(server, validator)
 {
     protected override async Task<IResponse> PacketHandle(RegistrationPacket packet, IConnection caller)
     {
