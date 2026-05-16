@@ -3,7 +3,7 @@ using OnChat.Protocol.Packets;
 using OnChat.Shared;
 using OnChat.Shared.Validation;
 
-namespace OnChat.Common.Packet;
+namespace OnChat.Common.Validation;
 
 public abstract class ValidationHandlerBase<T>(Server server, IValidator<T> validator) : PacketHandler<T> where T : BasePacket
 {
