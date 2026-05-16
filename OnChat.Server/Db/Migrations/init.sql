@@ -17,8 +17,16 @@ create table messages(
     ciphertext bytea not null,
     tag bytea not null,
     sender_id uuid not null references users(id),
-    receiver_id uuid not null references users(id),
     timestamp timestamptz not null default now()
+);
+
+create table recipient_entries(
+    id bigserial primary key,
+    message_id uuid references messages(id) not null,
+    recipient_id uuid references users(id) not null,
+    nonce bytea not null,
+    ciphertext bytea not null,
+    tag bytea not null
 );
 
 CREATE FUNCTION uuidv7(timestamptz DEFAULT clock_timestamp()) RETURNS uuid
