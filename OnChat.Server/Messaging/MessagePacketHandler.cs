@@ -9,6 +9,7 @@ using OnChat.Shared.Auth;
 using OnChat.Shared.Encryption;
 using OnChat.Shared.Messages;
 using OnChat.UsersManagement.Authentication;
+using RecipientEntry = DataModel.RecipientEntry;
 
 namespace OnChat.Messaging;
 
@@ -52,15 +53,29 @@ public class MessagePacketHandler(
             return false;
 
         EncryptedMessage message = packet.EncryptedMessage;
-        await db.InsertAsync(new Message
+
+        Guid messageId = (Guid)await db.InsertWithIdentityAsync(new Message
                              {
                                  EphemeralPublicKey = message.EphemeralPublicKey,
                                  Nonce = message.Nonce,
                                  Ciphertext = message.Ciphertext,
                                  Tag = message.Tag,
-                                 SenderId = senderId,
-                                 ReceiverId = receiver.Id
+                                 SenderId = senderId
                              });
+        
+        foreach (Shared.Encryption.RecipientEntry recipient in packet.EncryptedMessage.RecipientEntries)
+        {
+            await db.InsertAsync(
+                new RecipientEntry
+                {
+                    MessageId = messageId,
+                    RecipientId = recipient.UserId,
+                    Nonce = recipient.WrappedKey.Nonce,
+                    Ciphertext = recipient.WrappedKey.Ciphertext,
+                    Tag = recipient.WrappedKey.Tag,
+                }
+            );
+        }
         return true;
     }
 }
