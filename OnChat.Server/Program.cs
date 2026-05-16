@@ -4,8 +4,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OnChat;
+using OnChat.Common.Validation;
 using OnChat.Connection;
 using OnChat.Encryption;
+using OnChat.Shared;
 using OnChat.Shared.Messages;
 using OnChat.UsersManagement.Authentication;
 using Serilog;
@@ -27,6 +29,8 @@ builder.Services.AddSingleton(sp => new Server(
         typeof(SendMessagePacket).Assembly
     )
 );
+
+builder.Services.AddValidators(typeof(BasePacket).Assembly, typeof(Program).Assembly);
 
 builder.Services.AddScoped(provider =>
 {
